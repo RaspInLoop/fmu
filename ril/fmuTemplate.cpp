@@ -67,13 +67,13 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				fmi_transport = boost::shared_ptr<TTransport>(new TBufferedTransport(fmi_socket));
 				fmi_protocol = boost::shared_ptr<TProtocol>(new TBinaryProtocol(fmi_transport));
 				client = boost::shared_ptr<fmi::CoSimulationClient>(new fmi::CoSimulationClient(fmi_protocol));
-				fmi_transport->open();
+				
 				break;			
 			}
 			case DLL_PROCESS_DETACH:
 			{
-
-				fmi_transport->close();
+				if (fmi_transport->isOpen())
+					fmi_transport->close();
 				instances.clear();				
 				break;
 			}
@@ -197,8 +197,15 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 					"fmi2Instantiate: Missing GUID.");
 				return NULL;
 			}
+
+			std::string resourceLocation;
+			if (fmuResourceLocation != NULL)
+				resourceLocation = std::string(fmuResourceLocation);
+
 			fmi::Instance inst;
-			client->instanciate(inst, std::string(instanceName), fmi::Type::CoSimulation, std::string(fmuGUID), std::string(fmuResourceLocation), visible>0, loggingOn>0);
+			if (!fmi_transport->isOpen())
+			   fmi_transport->open();
+			client->instanciate(inst, std::string(instanceName), fmi::Type::CoSimulation, std::string(fmuGUID), resourceLocation, visible>0, loggingOn>0);
 			ModelInstance *comp = (ModelInstance *)functions->allocateMemory(1, sizeof(ModelInstance));
 			if (comp) {								
 				// set all categories to on or off. fmi2SetDebugLogging should be called to choose specific categories.
@@ -233,7 +240,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2SetupExperiment: toleranceDefined=%d tolerance=%g",
 					toleranceDefined, tolerance);
-			
+			if (!fmi_transport->isOpen())
+				fmi_transport->open();
 			return static_cast<fmi2Status>(client->setupExperiment(inst, toleranceDefined > 0, tolerance, startTime, stopTimeDefined > 0, stopTime));			
 		}
 
@@ -243,6 +251,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2EnterInitializationMode");
 		
+			if (!fmi_transport->isOpen())
+				fmi_transport->open();
 			fmi2Status status  = static_cast<fmi2Status>(client->enterInitializationMode(inst));
 			inst.state = fmi::ModelState::type::modelInitializationMode;
 			return status;
@@ -253,6 +263,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			if (invalidState(&inst, "fmi2ExitInitializationMode", MASK_fmi2ExitInitializationMode))
 				return fmi2Error;
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2ExitInitializationMode");
+			if (!fmi_transport->isOpen())
+				fmi_transport->open();
 			fmi2Status status = static_cast<fmi2Status>(client->exitInitializationMode(inst));
 			inst.state = fmi::ModelState::type::modelStepComplete;
 			return status;
@@ -264,6 +276,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2Terminate");
 
+			if (!fmi_transport->isOpen())
+			   fmi_transport->open();
 			fmi2Status status = static_cast<fmi2Status>(client->terminate(inst));
 			inst.state = fmi::ModelState::type::modelTerminated;
 			return status;
@@ -273,6 +287,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			fmi::Instance& inst = instances[c];
 			if (invalidState(&inst, "fmi2Reset", MASK_fmi2Reset))
 				return fmi2Error;
+			if (!fmi_transport->isOpen())
+				fmi_transport->open();
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2Reset");			
 			fmi2Status status = static_cast<fmi2Status>(client->reset(inst));
 			inst.state = fmi::ModelState::type::modelInstantiated;
@@ -298,6 +314,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				((ModelInstance *)c)->functions->freeMemory(it->second);
 			}	
 			valueRefStringBuffer.clear();
+			if (!fmi_transport->isOpen())
+				fmi_transport->open();
 			client->freeInstance(it->second);
 			instances.erase(it);
 		}
