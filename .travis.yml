@@ -1,10 +1,29 @@
 language: cpp
+
+cache:
+  apt: true
+
+addons:
+  apt:
+    sources:
+    - boost-latest
+    packages:
+    - libboost1.55-all-dev
+    - libevent-dev
+    - automake
+    - libtool
+    - flex
+    - bison
+    - pkg-config
+    - g++ 
+    - libssl-dev
+
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install libboost-dev libboost-test-dev libboost-program-options-dev libevent-dev automake libtool flex bison pkg-config g++ libssl-dev
   - wget http://archive.apache.org/dist/thrift/0.9.2/thrift-0.9.2.tar.gz
   - tar xfz thrift-0.9.2.tar.gz
-  - cd thrift-0.9.2 && ./configure && sudo make install
+  - cd thrift-0.9.2 
+  - ./configure --without-java --without-c_glib --without-python --without-ruby --without-erlang --without-nodejs && sudo make install
+  
 scripts:
   - cd ril
   - ./configure && make
