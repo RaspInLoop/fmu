@@ -26,4 +26,4 @@ before_install:
   - cd ..
   
 script:
-  - cd ril && ./configure && make
+  - cd ril && autoconf && automake && ./configure && make
