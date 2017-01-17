@@ -1,7 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+
+AC_PREREQ([2.68])
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
 AC_CONFIG_SRCDIR([fmuTemplate.cpp])
 AC_CONFIG_HEADERS([config.h])

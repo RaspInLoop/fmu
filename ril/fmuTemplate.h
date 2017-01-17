@@ -9,7 +9,7 @@
 #include <assert.h>
 
 #include "fmi2Functions.h"
-#include "generated\ril_types.h"
+#include "generated/ril_types.h"
 
 //fmi2Status setString(fmi2Component comp, fmi2ValueReference vr, fmi2String value);
 
