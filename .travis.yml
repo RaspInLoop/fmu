@@ -32,4 +32,4 @@ before_script:
   - ls -R $HOME/thrift
 
 script:
-  - cd ril && make THRIFT_DIR=$HOME/thrift/includes
+  - cd ril && make THRIFT_DIR=$HOME/thrift
