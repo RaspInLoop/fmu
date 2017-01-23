@@ -1,7 +1,7 @@
 SHARED_DIR=shared/include
 GENERATED_DIR=generated
 CC=g++
-CFLAGS= -std=c++0x -c -Wall  -I$(SHARED_DIR) -I$(THRIFT_DIR) -I$(GENERATED_DIR)/..
+CFLAGS= -std=c++0x -c -Wall  -I$(SHARED_DIR) -I$(THRIFT_DIR)/include -I$(GENERATED_DIR)/..
 PIC= -fPIC
 LDFLAGS= 
 # CBITSFLAGS is set to -m32 to build linux32 fmus
