@@ -1,4 +1,4 @@
- #!/bin/sh
+#!/bin/sh
 set -e
 # check to see if thrift folder is empty
 if [ ! -d "$HOME/thrift/lib" ]; then
