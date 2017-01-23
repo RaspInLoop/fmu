@@ -21,7 +21,7 @@ addons:
 
 
 before_install:
-  -bash installthrift.sh
+  - bash installthrift.sh
   
 cache:
   directories:
