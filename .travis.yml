@@ -30,7 +30,7 @@ cache:
 # check what has been installed by listing contents of thrift folder
 before_script:
   - ls -R $HOME/thrift
-  -  $HOME/thrift -R  --gen cpp ril/ril.thrift
+  -  $HOME/thrift/bin/thrift -R  --gen cpp ril/ril.thrift
   - ls -R gen-cpp
   - cat gen-cpp/ril_types.h
 
