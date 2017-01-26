@@ -1,24 +1,28 @@
 SHARED_DIR=shared/include
-GENERATED_DIR=generated
+GENERATED_DIR=gen-cpp
 CC=g++
-CFLAGS= -std=c++0x -c -Wall  -I$(SHARED_DIR) -I$(THRIFT_DIR)/include -I$(GENERATED_DIR)/..
+CFLAGS= -std=c++0x -c -Wall -I$(GENERATED_DIR) -I$(SHARED_DIR) -I$(THRIFT_DIR)/include 
 PIC= -fPIC
 LDFLAGS= 
 # CBITSFLAGS is set to -m32 to build linux32 fmus
-SOURCES=$(wildcard *.cpp)
-GENERATED_SOURCES=$(wildcard generated/*.cpp)
+
+THRIFT_DEFINITION=ril.thrift
+SOURCES=$(wildcard *.cpp) $(filter-out $(wildcard $(GENERATED_SOURCES)/*_server.skeleton.cpp), $(wildcard $(GENERATED_SOURCES)/*.cpp))
+GENERATED_SOURCES=gen-cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-GENERATED_OBJECTS=$(GENERATED_SOURCES:.cpp=.o)
 EXECUTABLE=ril_fmi.so
 
-all: $(SOURCES) $(GENERATED_SOURCES) $(EXECUTABLE)
-    
-$(EXECUTABLE): $(OBJECTS) $(GENERATED_OBJECTS)
-	$(CC) $(LDFLAGS)  $(CBITSFLAGS) $(OBJECTS) $(GENERATED_OBJECTS) -fvisibility=hidden -shared -Wl,-soname,$@ -o $@
+all: $(GENERATED_SOURCES) $(SOURCES)  $(EXECUTABLE)
 
-.cpp.o:
+$(GENERATED_SOURCES): $(THRIFT_DEFINITION)
+	$(THRIFT_DIR)/bin/thrift -r --gen cpp $?
+
+%.o : %.cpp	
 	$(CC) $(CBITSFLAGS) $(CFLAGS) $(PIC) $< -o $@
 
-clean:
-	rm -rf *.so *.o *~
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS)  $(CBITSFLAGS) $(OBJECTS) -fvisibility=hidden -shared -Wl,-soname,$@ -o $@
 
+clean:
+	rm -rf gen-cpp
+	rm -rf *.so *.o *~

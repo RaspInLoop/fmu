@@ -26,14 +26,13 @@
  * ---------------------------------------------------------------------------*/
 
 #include "fmuTemplate.h"
-
 #include <iostream>
 #include <cstdarg>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
-#include "generated/CoSimulation.h"
+#include "CoSimulation.h"
 
 using namespace std;
 using namespace apache::thrift;
