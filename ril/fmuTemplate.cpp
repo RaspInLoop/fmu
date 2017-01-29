@@ -26,14 +26,13 @@
  * ---------------------------------------------------------------------------*/
 
 #include "fmuTemplate.h"
-
 #include <iostream>
-
+#include <cstdarg>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
 
-#include "generated\CoSimulation.h"
+#include "CoSimulation.h"
 
 using namespace std;
 using namespace apache::thrift;
@@ -53,7 +52,7 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 		std::map<fmi2Component, fmi::Instance> instances;
 		std::map<fmi2Component, std::map<int, char*> > valueRefStringBufferByInstance;
 		 
-
+#ifdef _WIN32
 		BOOL APIENTRY DllMain(HMODULE hModule,
 			DWORD  ul_reason_for_call,
 			LPVOID lpReserved
@@ -87,7 +86,31 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			return TRUE;
 
 		}
+#elif __linux__
+	__attribute__((constructor))
+	/**
+	 *  * initializer of the lib.
+	 *   */
+	static void Initializer(int argc, char** argv, char** envp)
+	{
+	     fmi_socket = boost::shared_ptr<TTransport>(new TSocket("localhost", 9090));
+             fmi_transport = boost::shared_ptr<TTransport>(new TBufferedTransport(fmi_socket));
+             fmi_protocol = boost::shared_ptr<TProtocol>(new TBinaryProtocol(fmi_transport));
+             client = boost::shared_ptr<fmi::CoSimulationClient>(new fmi::CoSimulationClient(fmi_protocol));
+	}
 
+	__attribute__((destructor))
+	/** 
+	 *  * It is called when lib is being unloaded.
+	 *   * 
+	 *    */
+	static void Finalizer()
+	{
+	     if (fmi_transport->isOpen())
+                  fmi_transport->close();
+             instances.clear();
+	}
+#endif 
 
 		// ---------------------------------------------------------------------------
 		// Private helpers used below to validate function arguments
@@ -95,29 +118,19 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 
 
 		fmi2Boolean isCategoryLogged(ModelInstance *comp, int categoryIndex);
-
-		inline void FILTERED_LOG(const fmi::Instance& instance, fmi2Status status, unsigned int categoryIndex, const std::string& msg, ...) {
+		inline void FILTERED_LOG(const fmi::Instance& instance, fmi2Status status, unsigned int categoryIndex, const std::string& msg...) 
+{
 			if (isCategoryLogged((ModelInstance*)instance.componentRef, categoryIndex)) {
-				va_list vl;
-				va_start(vl, msg);
+                                va_list args;
+				va_start(args, msg);
 				((ModelInstance*)instance.componentRef)->functions->logger(((ModelInstance*)instance.componentRef)->functions->componentEnvironment,
 					instance.instanceName.c_str(),
 					status,
 					logCategoriesNames[categoryIndex],
 					msg.c_str(),
-					vl);
-				va_end(vl);
+					args);
+				va_end(args);
 			}
-		}
-
-
-		static fmi2Boolean invalidNumber(fmi::Instance *inst, const char *f, const char *arg, int n, int nExpected) {
-			if (n != nExpected) {
-				inst->state = fmi::ModelState::modelError;
-				FILTERED_LOG(*inst, fmi2Error, LOG_ERROR, "%s: Invalid argument %s = %d. Expected %d.", f, arg, n, nExpected);
-				return fmi2True;
-			}
-			return fmi2False;
 		}
 
 		static fmi2Boolean invalidState(fmi::Instance* inst, const char *f, int statesExpected) {
@@ -157,7 +170,7 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 
 		// return fmi2True if logging category is on. Else return fmi2False.
 		fmi2Boolean isCategoryLogged(ModelInstance *comp, int categoryIndex) {
-			if (categoryIndex < NUMBER_OF_CATEGORIES
+			if (categoryIndex < (int)NUMBER_OF_CATEGORIES
 				&& (comp->logCategories[categoryIndex] || comp->logCategories[LOG_ALL])) {
 				return fmi2True;
 			}
@@ -658,35 +671,6 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 
 			return static_cast<fmi2Status>(client->doStep(inst, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint > 0));
 
-		}
-
-		/* Inquire slave status */
-		static fmi2Status getStatus(char* fname, fmi2Component c, const fmi2StatusKind s) {
-			const char *statusKind[3] = { "fmi2DoStepStatus", "fmi2PendingStatus", "fmi2LastSuccessfulTime" };
-			fmi::Instance& inst = instances[c];
-			if (invalidState(&inst, fname, MASK_fmi2GetStatus)) // all get status have the same MASK_fmi2GetStatus
-				return fmi2Error;
-			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "$s: fmi2StatusKind = %s", fname, statusKind[s]);
-
-				switch (s) {
-				case fmi2DoStepStatus: FILTERED_LOG(inst, fmi2Error, LOG_ERROR,
-					"%s: Can be called with fmi2DoStepStatus when fmi2DoStep returned fmi2Pending."
-					" This is not the case.", fname);
-					break;
-				case fmi2PendingStatus: FILTERED_LOG(inst, fmi2Error, LOG_ERROR,
-					"%s: Can be called with fmi2PendingStatus when fmi2DoStep returned fmi2Pending."
-					" This is not the case.", fname);
-					break;
-				case fmi2LastSuccessfulTime: FILTERED_LOG(inst, fmi2Error, LOG_ERROR,
-					"%s: Can be called with fmi2LastSuccessfulTime when fmi2DoStep returned fmi2Discard."
-					" This is not the case.", fname);
-					break;
-				case fmi2Terminated: FILTERED_LOG(inst, fmi2Error, LOG_ERROR,
-					"%s: Can be called with fmi2Terminated when fmi2DoStep returned fmi2Discard."
-					" This is not the case.", fname);
-					break;
-			}
-			return fmi2Discard;
 		}
 
 		fmi2Status fmi2GetStatus(fmi2Component c, const fmi2StatusKind s, fmi2Status *value) {

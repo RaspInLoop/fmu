@@ -1,0 +1,38 @@
+language: cpp
+
+cache:
+  apt: true
+
+addons:
+  apt:
+    sources:
+    - boost-latest
+    packages:
+    - libboost1.55-all-dev
+    - libevent-dev
+    - automake
+    - autoconf
+    - libtool
+    - flex
+    - bison
+    - pkg-config
+    - g++ 
+    - libssl-dev
+
+
+before_install:
+  - bash installthrift.sh
+  
+cache:
+  directories:
+  - $HOME/thrift
+
+# check what has been installed by listing contents of thrift folder
+before_script:
+  - ls -R $HOME/thrift
+  -  $HOME/thrift/bin/thrift -r  --gen cpp ril/ril.thrift
+  - ls -R gen-cpp
+  - cat gen-cpp/ril_types.h
+
+script:
+  - cd ril && make THRIFT_DIR=$HOME/thrift
