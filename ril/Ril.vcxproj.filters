@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Generated">
-      <UniqueIdentifier>{e8e37916-d8ba-41b3-92d2-e3c4e8af1d7b}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -27,31 +24,19 @@
     <ClInclude Include="fmuTemplate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\ril_constants.h">
-      <Filter>Generated</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\ril_types.h">
-      <Filter>Generated</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\CoSimulation.h">
-      <Filter>Generated</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Ril.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="generated\ril_constants.cpp">
-      <Filter>Generated</Filter>
-    </ClCompile>
-    <ClCompile Include="generated\ril_types.cpp">
-      <Filter>Generated</Filter>
-    </ClCompile>
     <ClCompile Include="fmuTemplate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="generated\CoSimulation.cpp">
-      <Filter>Generated</Filter>
+    <ClCompile Include="gen-cpp\CoSimulation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gen-cpp\ril_constants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gen-cpp\ril_types.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

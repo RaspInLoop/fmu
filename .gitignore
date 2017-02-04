@@ -24,14 +24,17 @@
 *.lai
 *.la
 *.a
-*.lib
+
 
 # Executables
 *.exe
 *.out
 *.app
 
-Windwos 
-*/Debug
+Windows 
 *.suo
 *.sdf
+/ril/Win32
+/ril/x64
+/ril/gen-cpp
+/ril/ril_fmi
