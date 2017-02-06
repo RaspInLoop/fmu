@@ -1,0 +1,24 @@
+version: 1.0.{build}
+image: Visual Studio 2013
+configuration: Release
+platform:
+- x86
+- x64
+environment:
+  THRIFT_EXE_PATH: C:\projects\fmu\thrift-0.9.3.exe
+  THRIFT_DIR: C:\projects\fmu\thrift-0.9.3\lib\cpp
+  BOOST_ROOT: C:\Libraries\boost\
+  BOOST_LIB_32: C:\Libraries\boost\lib32-msvc-12.0
+  BOOST_LIB_64: C:\Libraries\boost\lib64-msvc-12.0
+install:
+- cmd: >-
+    appveyor DownloadFile http://archive.apache.org/dist/thrift/0.9.3/thrift-0.9.3.tar.gz
+
+    appveyor DownloadFile http://archive.apache.org/dist/thrift/0.9.3/thrift-0.9.3.exe
+
+    7z x thrift-0.9.3.tar.gz -so | 7z x -si -ttar > nul
+
+    (Get-Content thrift-0.9.3\lib\cpp\3rdparty.props) | ForEach-Object { $_ -replace "$(THIRD_PARTY)\boost\boost_1_47_0", "C:\Libraries\boost\" } | Set-Content thrift-0.9.3\lib\cpp\3rdparty.props
+build:
+  project: ril/Ril.sln
+  verbosity: minimal
