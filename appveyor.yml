@@ -19,7 +19,7 @@ install:
     7z x thrift-0.9.3.tar.gz -so | 7z x -si -ttar > nul
 
 - ps: >-
-   (Get-Content thrift-0.9.3\lib\cpp\3rdparty.props) | ForEach-Object { $_ -replace "$(THIRD_PARTY)\boost\boost_1_47_0", "C:\Libraries\boost\" } | Set-Content thrift-0.9.3\lib\cpp\3rdparty.props
+   (Get-Content thrift-0.9.3\lib\cpp\3rdparty.props) | ForEach-Object { $_ -replace "`$(THIRD_PARTY)\boost\boost_1_47_0", "C:\Libraries\boost\" } | Set-Content thrift-0.9.3\lib\cpp\3rdparty.props
 build:
   project: ril/Ril.sln
   verbosity: minimal
