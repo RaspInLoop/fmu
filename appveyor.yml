@@ -5,8 +5,8 @@ platform:
 - x86
 - x64
 environment:
-  THRIFT_EXE_PATH: C:\projects\fmu\thrift-0.9.3.exe
-  THRIFT_DIR: C:\projects\fmu\thrift-0.9.3\lib\cpp
+  THRIFT_EXE_PATH: C:\projects\fmu\thrift-0.10.0.exe
+  THRIFT_DIR: C:\projects\fmu\thrift-0.10.0\lib\cpp
   BOOST_ROOT: C:\Libraries\boost\
   BOOST_LIB_32: C:\Libraries\boost\lib32-msvc-12.0
   BOOST_LIB_64: C:\Libraries\boost\lib64-msvc-12.0
