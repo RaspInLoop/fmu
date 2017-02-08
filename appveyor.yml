@@ -14,9 +14,9 @@ install:
 - ps: >-
     Start-FileDownload  http://archive.apache.org/dist/thrift/0.10.0/thrift-0.10.0.tar.gz
     Start-FileDownload  http://archive.apache.org/dist/thrift/0.10.0/thrift-0.10.0.exe
--cmd: >-
+- cmd: >-
     7z x thrift-0.10.0.tar.gz -so | 7z x -si -ttar > nul
--ps: >-
+- ps: >-
     (Get-Content thrift-0.10.0\lib\cpp\3rdparty.props) | ForEach-Object { $_ -replace "\`$\(THIRD_PARTY\)\\boost\\boost_1_47_0", "C:\Libraries\boost\" } | Set-Content thrift-0.10.0\lib\cpp\3rdparty.props
     (Get-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj) | select-string -pattern 'Include=.*TSSLSocket\.' -notmatch |  Set-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
 build:
