@@ -23,12 +23,13 @@ install:
  foreach($PropertyGroup in $xml.Project.PropertyGroup){
  if ($PropertyGroup.Label  -eq 'Configuration')
  {
- $newChild = $xml.CreateElement("PlatformToolset")
- $newChild.set_InnerXML("v120")
- $PropertyGroup.AppendChild($newChild)
+ $newChild = $xml.CreateElement("PlatformToolset") 
+ $newChild.set_InnerXML("v120") 
+ $PropertyGroup.AppendChild($newChild) 
  }
  }
- $xml.Save(thrift-0.10.0\lib\cpp\libthrift.vcxproj)
+ $xml.Save(thrift-0.10.0\lib\cpp\libthrift.vcxproj) 
+ 
 build:
   project: ril/Ril.sln
   verbosity: minimal
