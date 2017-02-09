@@ -34,8 +34,6 @@ install:
    }
    $xml.OuterXml | Set-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
    
-   Get-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
-   
 - cmd: echo "install done"
 build:
   project: ril/Ril.sln
