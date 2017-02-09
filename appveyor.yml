@@ -25,7 +25,7 @@ install:
    
    foreach($PropertyGroup in $xml.Project.PropertyGroup){
       if ($PropertyGroup.Label  -eq 'Configuration'){
-         $newChild = $xml.CreateElement("PlatformToolset") 
+         $newChild = $xml.CreateElement("PlatformToolset","http://schemas.microsoft.com/developer/msbuild/2003") 
          
          $newChild.set_InnerXML("v120") 
          
