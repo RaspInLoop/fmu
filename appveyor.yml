@@ -29,7 +29,7 @@ install:
  }
  }
  $xml.Save(thrift-0.10.0\lib\cpp\libthrift.vcxproj) 
- 
+- cmd: echo "install done"
 build:
   project: ril/Ril.sln
   verbosity: minimal
