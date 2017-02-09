@@ -32,7 +32,7 @@ install:
          $PropertyGroup.AppendChild($newChild) 
       }
    }
-   $xml.Save(thrift-0.10.0\lib\cpp\libthrift.vcxproj)
+   $xml.OuterXml | Set-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
    
 - cmd: echo "install done"
 build:
