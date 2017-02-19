@@ -71,7 +71,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(BOOST_ROOT);C:\Users\Fred\Documents\Raspberry\thrift-0.9.2\lib\cpp\src;C:\Users\Fred\Documents\Raspberry\FMUSDK\fmu20\src\shared\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(Configuration);$(BOOST_LIB_32);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)ril_fmi\$(Configuration)\</IntDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(BOOST_ROOT);C:\Users\Fred\Documents\Raspberry\thrift-0.9.2\lib\cpp\src;C:\Users\Fred\Documents\Raspberry\FMUSDK\fmu20\src\shared\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Configuration);$(BOOST_LIB_64);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(BOOST_LIB_64);$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <CustomBuildBeforeTargets>
     </CustomBuildBeforeTargets>
@@ -88,13 +88,14 @@
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(BOOST_ROOT);$(THRIFT_DIR)\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)$(Configuration);$(BOOST_LIB_32);$(LibraryPath)</LibraryPath>
-    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)ril_fmi\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(BOOST_ROOT);$(THRIFT_DIR)\src;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)$(Configuration);$(BOOST_LIB_64);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)$(Platform)\$(Configuration);$(BOOST_LIB_64);$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
