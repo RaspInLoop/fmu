@@ -31,7 +31,7 @@ script:
 
 
 after_success:
-- mvn deploy -Darch=linuxx64 -Dgpg.skip=true --settings mvnsetting.xml
+- mvn deploy -Darch=linuxx64 -Dgpg.skip=true --settings mvnsettings.xml
 env:
   global:
   - secure: 3eM91kcH794XCaxeg8DJn0eE12q4jaKvVeu7yaA88NNeyh3tDrJmziNxf/jTniW+T7zKY6VDdXxq6vlVFssUqgMRr3MBuCnKVrrtmMXADJmBVOGbF6pMtTLsMMw6TsCmNFxa++PA2q/NoFVH3Hrn+NM6e/Y5+5D5s6ZAlmBjpMoP/GZNVw9grZ6yKPsF7KEeJSRk1gq//Sz8voCR7BqGAKbPsSt7RRapUQqREJ6Y+89/ODv6E3kFJVWU/PQN5bgunNluVAqz4APzvDIK/5kP1Bh5nDfixDiR85a6tL59nHGFe8B0XIS7/sKGeNWWRhb+W1ZZh8j8IdgSjj6qGcoWJ0vPEh9F1zYsCRdsIl32J2ThsYcUVLm7wiIN/jhVpKmrZwQDXTULPisp0EhNQKN0SvRKhl/4+y+hfb3FJwn2zOr4mfwmd2U24WWUuomnC8pDqkdqgr0ZuarpjbsPl32txFYV8h7nlBH+Cr0czie9SyjGr5JNMwxGFGxEIkDsm8bh+pWUyDJC/rgnQ5pLABGiwQr7okdhQN01dihiSG/bVlO+vXeko5WLb+PZiEYWIKOMCYyfjkjOZWabZqrpVOSQ79iTE8UQHmuj9WoGPrS9MruKkiY23gIquMJwAnsQPwfO/EPJ5yUbDwFdxhFTd1Gx1BRrC70N+qlK+62ShTp+i/c=
