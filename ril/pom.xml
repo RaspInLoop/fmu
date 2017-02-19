@@ -26,8 +26,23 @@
 
 
   <name>Raspinloop FMI assemblies</name>
-  <description>generate assembly for FMI library</description>
+  <description>Fonctional mockup interface library for Raspinloop project</description>
+  <url>http://www.raspinloop.org/about/</url>
 
+  <licenses>
+    <license>
+        <name>Eclipse Public License - v 1.0</name>
+      <url>https://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+        <id>fmahiant</id>
+        <name>Fred Mahiant</name>
+        <email>admin@raspinloop.org</email>
+    </developer>
+  </developers>
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -153,8 +168,8 @@
   </build>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/sandbox/trunk/site/cookbook/attach-source-javadoc/</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/sandbox/trunk/site/cookbook/attach-source-javadoc/</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/sandbox/trunk/site/cookbook/attach-source-javadoc/</url>
+    <url>https://github.com/RaspInLoop/fmu</url>
+    <connection>scm:git:git://github.com/RaspInLoop/fmu.git</connection>
+    <developerConnection>scm:git:git@github.com:RaspInLoop/fmu.git</developerCon
   </scm>
 </project>

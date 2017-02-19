@@ -38,3 +38,5 @@ Windows
 /ril/x64
 /ril/gen-cpp
 /ril/ril_fmi
+/thrift-0.10.0
+/ril/target

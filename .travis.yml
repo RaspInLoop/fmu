@@ -1,8 +1,8 @@
 language: cpp
-
 cache:
-  apt: true
-
+  directories:
+  - "$HOME/thrift"
+  - "~/.m2/repository"
 addons:
   apt:
     sources:
@@ -16,23 +16,24 @@ addons:
     - flex
     - bison
     - pkg-config
-    - g++ 
+    - g++
     - libssl-dev
-
-
+    - maven
 before_install:
-  - bash installthrift.sh
-  
-cache:
-  directories:
-  - $HOME/thrift
-
-# check what has been installed by listing contents of thrift folder
+- bash installthrift.sh
 before_script:
-  - ls -R $HOME/thrift
-  -  $HOME/thrift/bin/thrift -r  --gen cpp ril/ril.thrift
-  - ls -R gen-cpp
-  - cat gen-cpp/ril_types.h
-
+- ls -R $HOME/thrift
+- "$HOME/thrift/bin/thrift -r  --gen cpp ril/ril.thrift"
+- ls -R gen-cpp
+- cat gen-cpp/ril_types.h
 script:
-  - cd ril && make THRIFT_DIR=$HOME/thrift
+- cd ril && make THRIFT_DIR=$HOME/thrift
+
+
+after_success:
+- cd ril && mvn deploy -Darch=linuxx64 -Dgpg.skip=true --settings mvnsetting.xml  
+env:
+  global:
+  - secure: 3eM91kcH794XCaxeg8DJn0eE12q4jaKvVeu7yaA88NNeyh3tDrJmziNxf/jTniW+T7zKY6VDdXxq6vlVFssUqgMRr3MBuCnKVrrtmMXADJmBVOGbF6pMtTLsMMw6TsCmNFxa++PA2q/NoFVH3Hrn+NM6e/Y5+5D5s6ZAlmBjpMoP/GZNVw9grZ6yKPsF7KEeJSRk1gq//Sz8voCR7BqGAKbPsSt7RRapUQqREJ6Y+89/ODv6E3kFJVWU/PQN5bgunNluVAqz4APzvDIK/5kP1Bh5nDfixDiR85a6tL59nHGFe8B0XIS7/sKGeNWWRhb+W1ZZh8j8IdgSjj6qGcoWJ0vPEh9F1zYsCRdsIl32J2ThsYcUVLm7wiIN/jhVpKmrZwQDXTULPisp0EhNQKN0SvRKhl/4+y+hfb3FJwn2zOr4mfwmd2U24WWUuomnC8pDqkdqgr0ZuarpjbsPl32txFYV8h7nlBH+Cr0czie9SyjGr5JNMwxGFGxEIkDsm8bh+pWUyDJC/rgnQ5pLABGiwQr7okdhQN01dihiSG/bVlO+vXeko5WLb+PZiEYWIKOMCYyfjkjOZWabZqrpVOSQ79iTE8UQHmuj9WoGPrS9MruKkiY23gIquMJwAnsQPwfO/EPJ5yUbDwFdxhFTd1Gx1BRrC70N+qlK+62ShTp+i/c=
+  - secure: BUVDGv6Za3EtIU2ljOMcH9QnKlNWZWKBCdKV7I6UcfatXqGKrzyvWXsPEidSqg4psuHm2q3yPFANbkGw0yfKmUs4tZWVVQZc5Z56xB5P2QAcDIDZ6cecHA14PcmsUa/mzl5GAcG+f0V0/LPhfhd1KWvzL8Jec144pXpIOmAE0IUeo1XDd3u2ZuIWs1jGgZTiyxaeRMIastG/4UgKQZ8hTFzERWeISQGfY6GqNOcNjstHzneXYGd2h/Ftowps8bxnPeXdGgCtcMcyDijN3uf/BZXo6lC/h4alzS7eWdtWZPgYT7Low3tL3/OzvlOI8PAh7NXOwzcbArF2/5t9M90xfGqiOwIm/yJCt1AGj1HC8MkAuJHysq/WXd9wjmgG4g0cI2DVOyxtSOtsJxV+TKXK1TQ4YAJ2c+vRrHxRkPZjm1cDydyCPeumIe5igWdeswFLhJi/rrKh8xEpAfM5R8miO2BCyczS6oCFmJonkd7FmKpHvL06KUdELg4rcWc6q23GreY7fHIojOfT1X4rKINe0CYRjpZZD1z39MFHmiVgI9uvVlLmVA4qmtCLW4wVQ4JAHfZp02MhQmlv9HIVOSeqOJpICqrMh/x/j3wsthOL/OLd2IWYIhiRsyHprZLy2VkC0wDNbogRIchdR5x7efqXk/KaCRUi/rafdwnqE6yo2HA=
+  - secure: RGNCzpj3COArh3s0xULYvFbFd4BRJ9oxK8UMuJdBGmGVHJJvstgv9IDomMQl1OEpChVDwOp1hiTE4Yg8Y25erBzX+cMW71A9MbkOlaaedkP4I72qeglYdjMAHDQIaAbUOU7sx6D+UT6J2yV40YdMTyDJXeZNT8pJLi20agpO7PS0t3FzIUFmAIVZ/TmH3ydwjcfHZ1VtDsXNAVSeuLszxETipl7X22GJ5AO4oSWoDRrmZ9h/veLEDZ6p3fkP5jfW9tcMX5IF5Gs7wHawYDqPUJ5vvyHTa0fWZOuziWfR9B5iJwpfs2oiAYWy5X4ITGJCwGMOaNmM03+RRD4VGMSSlfeihAyjlkYclFSGfXmzMRqJVsd3zuAEEIko97R22g3EVagmsjc6l3iSy4JbUaTtocyvIRZGByO+fGVb8xI5eoBTdD+GAld16Yzl5kjDoCuuExoINUiKZej6B/vyAj9zXOuJCH0eTSRFJMD10LNv2FG2Gc/N+f2WtzUegwkEzl6mXVziQxZP9+CU8IoraZ3yfLrSXIzRkMiQk5ZUmwwnqKQpg+lM5Ms4Lgcxu3/UOrJfkkZkFqJMijJqANemd58h2OrfG0x+nFNyVZdkEBEEnGEANnB66a38+YnyPru8T8CjCNl5SNuKfRPjXlyin34AEJxOfRJvS/DOqcb8Tcbl2Ac=
