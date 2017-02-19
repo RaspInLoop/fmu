@@ -65,4 +65,4 @@ build:
   verbosity: minimal
 
 on_success:
-  - ps: "If ($env:Platform -Match \"x86\") {\n cd ril && mvn deploy -Darch=winx86 -Dgpg.skip=true  \n} Else {\n  cd ril && mvn deploy -Darch=winx64 -Dgpg.skip=true \n}
+  - ps: If ($env:Platform -Match \"x86\") {\n cd ril && mvn deploy -Darch=winx86 -Dgpg.skip=true  \n} Else {\n  cd ril && mvn deploy -Darch=winx64 -Dgpg.skip=true \n}
