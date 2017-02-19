@@ -71,11 +71,11 @@ on_success:
 
       If ($env:Platform -Match "x86") {
 
-       mvn deploy "-Darch=winx86" "-Dgpg.skip=true"
+       mvn deploy "-Darch=winx86" "-Dgpg.skip=true" --settings mvnsettings.xml
 
        }
        Else {
 
-       mvn deploy "-Darch=winx64" "-Dgpg.skip=true"
+       mvn deploy "-Darch=winx64" "-Dgpg.skip=true" --settings mvnsettings.xml
 
        }
