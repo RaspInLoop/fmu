@@ -10,7 +10,31 @@ environment:
   BOOST_ROOT: C:\Libraries\boost\
   BOOST_LIB_32: C:\Libraries\boost\lib32-msvc-12.0
   BOOST_LIB_64: C:\Libraries\boost\lib64-msvc-12.0
+
+  OSSRH_JIRA_USERNAME:
+    secure: WMhdJiW2wh9ftQPirukCVQY2Hp8RpbxSUVwRDp2v4wQ=
+  OSSRH_JIRA_PASSWORD:
+    secure: o33xELZotwMLyES5doLl/9L6+BEGRPDnoJxXs0HW6bk=
+  GPG_PASSPHRASE:
+    secure: +o/Jlls7dnR64lK9bToPZs4No2BZ97EsFkvZFE4W61g=
+
+cache:
+  - C:\maven\
+  - C:\Users\appveyor\.m2
+
 install:
+- ps: |
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      if (!(Test-Path -Path "C:\maven" )) {
+        (new-object System.Net.WebClient).DownloadFile(
+          'http://www.us.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.zip',
+          'C:\maven-bin.zip'
+        )
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
+      }
+- cmd: SET PATH=C:\maven\apache-maven-3.2.5\bin;%JAVA_HOME%\bin;%PATH%
+- cmd: SET MAVEN_OPTS=-XX:MaxPermSize=2g -Xmx4g
+- cmd: SET JAVA_OPTS=-XX:MaxPermSize=2g -Xmx4g
 - ps: Start-FileDownload  http://archive.apache.org/dist/thrift/0.10.0/thrift-0.10.0.tar.gz
 - ps: Start-FileDownload  http://archive.apache.org/dist/thrift/0.10.0/thrift-0.10.0.exe
 - cmd: 7z x thrift-0.10.0.tar.gz -so | 7z x -si -ttar > nul
@@ -18,23 +42,27 @@ install:
 - ps: (Get-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj) | select-string -pattern 'Include=.*TSSLSocket\.' -notmatch | Set-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
 - ps: >-
    $xml = [xml](Get-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj)
-   
+
    $node = $xml.Project
-   
+
    $node.ToolsVersion= "12.0"
-   
+
    foreach($PropertyGroup in $xml.Project.PropertyGroup){
       if ($PropertyGroup.Label  -eq 'Configuration'){
-         $newChild = $xml.CreateElement("PlatformToolset","http://schemas.microsoft.com/developer/msbuild/2003") 
-         
-         $newChild.set_InnerXML("v120") 
-         
-         $PropertyGroup.AppendChild($newChild) 
+         $newChild = $xml.CreateElement("PlatformToolset","http://schemas.microsoft.com/developer/msbuild/2003")
+
+         $newChild.set_InnerXML("v120")
+
+         $PropertyGroup.AppendChild($newChild)
       }
    }
    $xml.OuterXml | Set-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
-   
+
 - cmd: echo "install done"
+
 build:
   project: ril/Ril.sln
   verbosity: minimal
+
+on_success:
+  - ps: "If ($env:Platform -Match \"x86\") {\n cd ril && mvn deploy -Darch=winx86 -Dgpg.skip=true  \n} Else {\n  cd ril && mvn deploy -Darch=winx64 -Dgpg.skip=true \n}
