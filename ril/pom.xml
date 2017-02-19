@@ -170,6 +170,6 @@
   <scm>
     <url>https://github.com/RaspInLoop/fmu</url>
     <connection>scm:git:git://github.com/RaspInLoop/fmu.git</connection>
-    <developerConnection>scm:git:git@github.com:RaspInLoop/fmu.git</developerCon
+    <developerConnection>scm:git:git@github.com:RaspInLoop/fmu.git</developerConnection>
   </scm>
 </project>
