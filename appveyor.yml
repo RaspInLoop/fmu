@@ -33,8 +33,7 @@ install:
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
       }
 - cmd: SET PATH=C:\maven\apache-maven-3.2.5\bin;%JAVA_HOME%\bin;%PATH%
-- cmd: SET M2_HOME=C:\maven\apache-maven-3.2.5
-- cmd: cd c:\maven\maven && dir
+- cmd: SET M2_HOME=C:\maven\maven\apache-maven-3.2.5
 - cmd: SET MAVEN_OPTS=-Xmx4g
 - cmd: SET JAVA_OPTS=-Xmx4g
 - ps: Start-FileDownload  http://archive.apache.org/dist/thrift/0.10.0/thrift-0.10.0.tar.gz
