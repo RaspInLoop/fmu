@@ -12,7 +12,7 @@
       </includes>
     </fileSet>
     <fileSet>
-      <directory>Release</directory>
+      <directory>x64\Release</directory>
       <outputDirectory></outputDirectory>
       <includes>
         <include>*.dll</include>
