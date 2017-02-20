@@ -21,8 +21,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.raspinloop.fmi</groupId>
-  <artifactId>ril_fmi</artifactId>
-  <version>${arch}-1.0-SNAPSHOT</version>
+  <artifactId>ril_fmi_${arch}</artifactId>
+  <version>2.0-SNAPSHOT</version>
 
 
   <name>Raspinloop FMI assemblies</name>
