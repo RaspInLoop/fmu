@@ -215,33 +215,38 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			if (fmuResourceLocation != NULL)
 				resourceLocation = std::string(fmuResourceLocation);
 
-			fmi::Instance inst;
-			if (!fmi_transport->isOpen())
-			   fmi_transport->open();
-			client->instanciate(inst, std::string(instanceName), fmi::Type::CoSimulation, std::string(fmuGUID), resourceLocation, visible>0, loggingOn>0);
-			ModelInstance *comp = (ModelInstance *)functions->allocateMemory(1, sizeof(ModelInstance));
-			if (comp) {								
-				// set all categories to on or off. fmi2SetDebugLogging should be called to choose specific categories.
-				for (unsigned int i = 0; i < NUMBER_OF_CATEGORIES; i++) {
-					comp->logCategories[i] = loggingOn;
+			try {
+				fmi::Instance inst;
+				if (!fmi_transport->isOpen())
+					fmi_transport->open();
+				client->instanciate(inst, std::string(instanceName), fmi::Type::CoSimulation, std::string(fmuGUID), resourceLocation, visible > 0, loggingOn > 0);
+				ModelInstance *comp = (ModelInstance *)functions->allocateMemory(1, sizeof(ModelInstance));
+				if (comp) {
+					// set all categories to on or off. fmi2SetDebugLogging should be called to choose specific categories.
+					for (unsigned int i = 0; i < NUMBER_OF_CATEGORIES; i++) {
+						comp->logCategories[i] = loggingOn;
+					}
 				}
-			}
-			if (!comp) {
+				if (!comp) {
 					functions->logger(functions->componentEnvironment, instanceName, fmi2Error, "error",
-					"fmi2Instantiate: Out of memory.");
+						"fmi2Instantiate: Out of memory.");
 					return NULL;
-			}					
-			comp->functions = functions;
-			comp->componentEnvironment = functions->componentEnvironment;
-			comp->loggingOn = loggingOn;
-			inst.componentRef = (int64_t)comp;
-			inst.state = fmi::ModelState::modelInstantiated;
-			instances.insert(std::pair<fmi2Component, fmi::Instance>(comp, inst));
-			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2Instantiate Done");
-			comp->functions->logger(comp->functions->componentEnvironment, "unknown", fmi2Error, "error",
-				"fmi2SetDebugLogging");
-			return comp;
+				}
+				comp->functions = functions;
+				comp->componentEnvironment = functions->componentEnvironment;
+				comp->loggingOn = loggingOn;
+				inst.componentRef = (int64_t)comp;
+				inst.state = fmi::ModelState::modelInstantiated;
+				instances.insert(std::pair<fmi2Component, fmi::Instance>(comp, inst));
+				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2Instantiate Done");
+				comp->functions->logger(comp->functions->componentEnvironment, "unknown", fmi2Error, "error",
+					"fmi2SetDebugLogging");
+				return comp;
 			}
+			catch (std::exception){
+				return NULL;
+			}
+		}
 
 
 		fmi2Status fmi2SetupExperiment(fmi2Component c, fmi2Boolean toleranceDefined, fmi2Real tolerance,
@@ -253,9 +258,14 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2SetupExperiment: toleranceDefined=%d tolerance=%g",
 					toleranceDefined, tolerance);
-			if (!fmi_transport->isOpen())
-				fmi_transport->open();
-			return static_cast<fmi2Status>(client->setupExperiment(inst, toleranceDefined > 0, tolerance, startTime, stopTimeDefined > 0, stopTime));			
+			try {
+				if (!fmi_transport->isOpen())
+					fmi_transport->open();
+				return static_cast<fmi2Status>(client->setupExperiment(inst, toleranceDefined > 0, tolerance, startTime, stopTimeDefined > 0, stopTime));			
+			}
+			catch (std::exception ){
+				return fmi2Fatal;
+			}
 		}
 
 		fmi2Status fmi2EnterInitializationMode(fmi2Component c) {
@@ -264,11 +274,16 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2EnterInitializationMode");
 		
-			if (!fmi_transport->isOpen())
-				fmi_transport->open();
-			fmi2Status status  = static_cast<fmi2Status>(client->enterInitializationMode(inst));
-			inst.state = fmi::ModelState::type::modelInitializationMode;
-			return status;
+			try {
+				if (!fmi_transport->isOpen())
+					fmi_transport->open();
+				fmi2Status status  = static_cast<fmi2Status>(client->enterInitializationMode(inst));
+				inst.state = fmi::ModelState::type::modelInitializationMode;
+				return status;
+			}
+			catch (std::exception ){
+				return fmi2Fatal;
+			}
 		}
 
 		fmi2Status fmi2ExitInitializationMode(fmi2Component c) {
@@ -276,11 +291,16 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			if (invalidState(&inst, "fmi2ExitInitializationMode", MASK_fmi2ExitInitializationMode))
 				return fmi2Error;
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2ExitInitializationMode");
-			if (!fmi_transport->isOpen())
-				fmi_transport->open();
-			fmi2Status status = static_cast<fmi2Status>(client->exitInitializationMode(inst));
-			inst.state = fmi::ModelState::type::modelStepComplete;
-			return status;
+			try  {
+				if (!fmi_transport->isOpen())
+					fmi_transport->open();
+				fmi2Status status = static_cast<fmi2Status>(client->exitInitializationMode(inst));
+				inst.state = fmi::ModelState::type::modelStepComplete;
+				return status;
+			}
+			catch (std::exception ){
+				return fmi2Fatal;
+			}
 		}
 
 		fmi2Status fmi2Terminate(fmi2Component c) {
@@ -289,23 +309,33 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2Terminate");
 
-			if (!fmi_transport->isOpen())
-			   fmi_transport->open();
-			fmi2Status status = static_cast<fmi2Status>(client->terminate(inst));
-			inst.state = fmi::ModelState::type::modelTerminated;
-			return status;
+			try{
+				if (!fmi_transport->isOpen())
+				   fmi_transport->open();
+				fmi2Status status = static_cast<fmi2Status>(client->terminate(inst));
+				inst.state = fmi::ModelState::type::modelTerminated;
+				return status;
+			}
+			catch (std::exception ){
+				return fmi2Fatal;
+			}
 		}
 
 		fmi2Status fmi2Reset(fmi2Component c) {
 			fmi::Instance& inst = instances[c];
 			if (invalidState(&inst, "fmi2Reset", MASK_fmi2Reset))
 				return fmi2Error;
-			if (!fmi_transport->isOpen())
-				fmi_transport->open();
-			FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2Reset");			
-			fmi2Status status = static_cast<fmi2Status>(client->reset(inst));
-			inst.state = fmi::ModelState::type::modelInstantiated;
-			return status;
+			try{
+				if (!fmi_transport->isOpen())
+					fmi_transport->open();
+				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2Reset");			
+				fmi2Status status = static_cast<fmi2Status>(client->reset(inst));
+				inst.state = fmi::ModelState::type::modelInstantiated;
+				return status;
+			}
+			catch (std::exception ){
+				return fmi2Fatal;
+			}
 		}
 
 		void fmi2FreeInstance(fmi2Component c) {
@@ -327,10 +357,14 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				((ModelInstance *)c)->functions->freeMemory(it->second);
 			}	
 			valueRefStringBuffer.clear();
-			if (!fmi_transport->isOpen())
-				fmi_transport->open();
-			client->freeInstance(it->second);
-			instances.erase(it);
+			try  {
+				if (!fmi_transport->isOpen())
+					fmi_transport->open();
+				client->freeInstance(it->second);
+				instances.erase(it);
+			}
+			catch (std::exception ){				
+			}
 		}
 
 		// ---------------------------------------------------------------------------
