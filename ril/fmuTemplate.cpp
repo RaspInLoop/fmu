@@ -244,6 +244,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return comp;
 			}
 			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}				
 				return NULL;
 			}
 		}
@@ -264,6 +266,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return static_cast<fmi2Status>(client->setupExperiment(inst, toleranceDefined > 0, tolerance, startTime, stopTimeDefined > 0, stopTime));			
 			}
 			catch (std::exception ){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 				return fmi2Fatal;
 			}
 		}
@@ -282,6 +286,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return status;
 			}
 			catch (std::exception ){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 				return fmi2Fatal;
 			}
 		}
@@ -299,6 +305,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return status;
 			}
 			catch (std::exception ){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 				return fmi2Fatal;
 			}
 		}
@@ -317,6 +325,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return status;
 			}
 			catch (std::exception ){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 				return fmi2Fatal;
 			}
 		}
@@ -334,6 +344,8 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return status;
 			}
 			catch (std::exception ){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 				return fmi2Fatal;
 			}
 		}
@@ -363,7 +375,9 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				client->freeInstance(it->second);
 				instances.erase(it);
 			}
-			catch (std::exception ){				
+			catch (std::exception ){	
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 			}
 		}
 
@@ -441,15 +455,21 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			if (nvr > 0 && nullPointer(&inst, "fmi2GetReal", "value[]", value))
 				return fmi2Error;
-	
-			std::vector<double> values;
-			client->getReal(values, inst, std::vector<int32_t>(vr, vr + nvr));
-			if (values.size() < nvr)
-				return fmi2Error;
-			for (size_t i = 0; i < nvr; i++) {
-				value[i] = values[i];
-				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetReal: #r%u# = %.16g", vr[i], value[i]);
-			}
+			try {
+					std::vector<double> values;
+					client->getReal(values, inst, std::vector<int32_t>(vr, vr + nvr));
+					if (values.size() < nvr)
+						return fmi2Error;
+					for (size_t i = 0; i < nvr; i++) {
+						value[i] = values[i];
+						FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetReal: #r%u# = %.16g", vr[i], value[i]);
+					}
+				}
+				catch (std::exception){
+					try { fmi_transport->close(); }
+					catch (std::exception){}
+					return fmi2Error;
+				}
 			
 			return fmi2OK;
 		}
@@ -462,14 +482,20 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			if (nvr > 0 && nullPointer(&inst, "fmi2GetInteger", "value[]", value))
 				return fmi2Error;
-						
-			std::vector<int32_t> values;
-			client->getInteger(values, inst, std::vector<int32_t>(vr, vr + nvr));
-			if (values.size() < nvr)
+			try {
+				std::vector<int32_t> values;
+				client->getInteger(values, inst, std::vector<int32_t>(vr, vr + nvr));
+				if (values.size() < nvr)
+					return fmi2Error;
+				for (size_t i = 0; i < nvr; i++) {
+					value[i] = values[i];
+					FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetInteger: #i%u# = %d", vr[i], value[i]);
+				}
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 				return fmi2Error;
-			for (size_t i = 0; i < nvr; i++) {
-				value[i] = values[i];
-				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetInteger: #i%u# = %d", vr[i], value[i]);
 			}
 			return fmi2OK;
 		}
@@ -482,14 +508,20 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			if (nvr > 0 && nullPointer(&inst, "fmi2GetBoolean", "value[]", value))
 				return fmi2Error;
-
-			std::vector<bool> values;
-			client->getBoolean(values, inst, std::vector<int32_t>(vr, vr + nvr));
-			if (values.size() < nvr)
+			try {
+				std::vector<bool> values;
+				client->getBoolean(values, inst, std::vector<int32_t>(vr, vr + nvr));
+				if (values.size() < nvr)
+					return fmi2Error;
+				for (size_t i = 0; i < nvr; i++) {
+					value[i] = values[i];
+					FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetBoolean: #b%u# = %s", vr[i], value[i] ? "true" : "false");
+				}
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
 				return fmi2Error;
-			for (size_t i = 0; i < nvr; i++) {
-				value[i] = values[i];
-				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetBoolean: #b%u# = %s", vr[i], value[i] ? "true" : "false");
 			}
 			return fmi2OK;
 		}
@@ -503,26 +535,32 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			if (nvr > 0 && nullPointer(&inst, "fmi2GetString", "value[]", value))
 				return fmi2Error;			
 
-
-			std::vector<std::string> values;
-			client->getString(values, inst, std::vector<int32_t>(vr, vr + nvr));
-			if (values.size() < nvr)
-				return fmi2Error;
+				try {
+					std::vector<std::string> values;
+					client->getString(values, inst, std::vector<int32_t>(vr, vr + nvr));
+					if (values.size() < nvr)
+						return fmi2Error;
 			
-			std::map<int, char*>& valueRefStringBuffer = valueRefStringBufferByInstance[c];
+					std::map<int, char*>& valueRefStringBuffer = valueRefStringBufferByInstance[c];
 
-			for (size_t i = 0; i < nvr; i++) {
-				if (valueRefStringBuffer[vr[i]] != NULL){
-					((ModelInstance*)c)->functions->freeMemory(valueRefStringBuffer[vr[i]]);
+					for (size_t i = 0; i < nvr; i++) {
+						if (valueRefStringBuffer[vr[i]] != NULL){
+							((ModelInstance*)c)->functions->freeMemory(valueRefStringBuffer[vr[i]]);
+						}
+						valueRefStringBuffer[vr[i]] = (char*)((ModelInstance*)c)->functions->allocateMemory(1 + values[i].size(), sizeof(char));
+						strcpy((char *)valueRefStringBuffer[vr[i]], (char *)values[i].c_str());
+						value[i] = valueRefStringBuffer[vr[i]];
+
+						FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetString: #s%u# = '%s'", vr[i], value[i]);
+					}
 				}
-				valueRefStringBuffer[vr[i]] = (char*)((ModelInstance*)c)->functions->allocateMemory(1 + values[i].size(), sizeof(char));
-				strcpy((char *)valueRefStringBuffer[vr[i]], (char *)values[i].c_str());
-				value[i] = valueRefStringBuffer[vr[i]];
-
-				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2GetString: #s%u# = '%s'", vr[i], value[i]);
-			}
-			return fmi2OK;
-		}
+				catch (std::exception){
+					try { fmi_transport->close(); }
+					catch (std::exception){}
+					return fmi2Error;
+				}
+					return fmi2OK;
+				}
 
 		fmi2Status fmi2SetReal(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2Real value[]) {
 			fmi::Instance& inst = instances[c];
@@ -539,9 +577,15 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2SetReal: #r%d# = %.16g", vr[i], value[i]);
 				reals.insert(std::pair<int32_t, double>(vr[i], value[i]));
 			}
-
-			return static_cast<fmi2Status>(client->setReal(inst, reals));
-		}
+			try {
+				return static_cast<fmi2Status>(client->setReal(inst, reals));
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
+			}
 
 		fmi2Status fmi2SetInteger(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2Integer value[]) {
 			fmi::Instance& inst = instances[c];
@@ -559,9 +603,14 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2SetInteger: #i%d# = %d", vr[i], value[i]);
 					integers.insert(std::pair<int32_t, int32_t>(vr[i], value[i]));
 			}
-
-			return static_cast<fmi2Status>(client->setInteger(inst, integers));
-	
+			try {
+				return static_cast<fmi2Status>(client->setInteger(inst, integers));
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 		}
 
 		fmi2Status fmi2SetBoolean(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2Boolean value[]) {
@@ -580,8 +629,14 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2SetBoolean: #b%d# = %s", vr[i], value[i] ? "true" : "false");
 				bools.insert(std::pair<int32_t, bool>(vr[i], value[i]>0));
 			}
-
-			return static_cast<fmi2Status>(client->setBoolean(inst, bools));
+			try {
+				return static_cast<fmi2Status>(client->setBoolean(inst, bools));
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 		}
 
 		fmi2Status fmi2SetString(fmi2Component c, const fmi2ValueReference vr[], size_t nvr, const fmi2String value[]) {			
@@ -600,8 +655,14 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				FILTERED_LOG(inst, fmi2OK, LOG_FMI_CALL, "fmi2SetString: #s%d# = '%s'", vr[i], value[i]);
 				strings.insert(std::pair<int32_t, std::string>(vr[i], std::string(value[i])));
 			}
-
-			return static_cast<fmi2Status>(client->setString(inst, strings));
+			try {
+				return static_cast<fmi2Status>(client->setString(inst, strings));
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 		}
 
 		fmi2Status fmi2GetFMUstate(fmi2Component c, fmi2FMUstate* FMUstate) {
@@ -702,52 +763,91 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 				return fmi2Error;
 			}
 
-
-			return static_cast<fmi2Status>(client->doStep(inst, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint > 0));
+			try {
+				return static_cast<fmi2Status>(client->doStep(inst, currentCommunicationPoint, communicationStepSize, noSetFMUStatePriorToCurrentPoint > 0));
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 
 		}
 
 		fmi2Status fmi2GetStatus(fmi2Component c, const fmi2StatusKind s, fmi2Status *value) {
-			fmi::Instance& inst = instances[c];
-			fmi2Status status = static_cast<fmi2Status>(client->getStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
-			*value = status;
-			return fmi2OK;
+			try {
+				fmi::Instance& inst = instances[c];			
+				fmi2Status status = static_cast<fmi2Status>(client->getStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
+				*value = status;
+				return fmi2OK;
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 
 		}
 
 		fmi2Status fmi2GetRealStatus(fmi2Component c, const fmi2StatusKind s, fmi2Real *value) {
-			ModelInstance *comp = static_cast<ModelInstance*>(c);
-			fmi::Instance& inst = instances[comp];
-			fmi2Real status = static_cast<fmi2Real>(client->getRealStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
-			*value = status;
-			return fmi2OK;
-
+			try {
+				ModelInstance *comp = static_cast<ModelInstance*>(c);
+				fmi::Instance& inst = instances[comp];
+				fmi2Real status = static_cast<fmi2Real>(client->getRealStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
+				*value = status;
+				return fmi2OK;
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 
 		}
 
 		fmi2Status fmi2GetIntegerStatus(fmi2Component c, const fmi2StatusKind s, fmi2Integer *value) {
-			fmi::Instance& inst = instances[c];
-			fmi2Integer status = static_cast<fmi2Integer>(client->getIntegerStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
-			*value = status;
-			return fmi2OK;
-
+			try {
+				fmi::Instance& inst = instances[c];
+				fmi2Integer status = static_cast<fmi2Integer>(client->getIntegerStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
+				*value = status;
+				return fmi2OK;
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 		}
 
 		fmi2Status fmi2GetBooleanStatus(fmi2Component c, const fmi2StatusKind s, fmi2Boolean *value) {
-			fmi::Instance& inst = instances[c];
-			fmi2Boolean status = static_cast<fmi2Boolean>(client->getBooleanStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
-			*value = status;
-			return fmi2OK;					
+			try {
+				fmi::Instance& inst = instances[c];
+				fmi2Boolean status = static_cast<fmi2Boolean>(client->getBooleanStatus(inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s)));
+				*value = status;
+				return fmi2OK;					
+			}
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 		}
 
 		fmi2Status fmi2GetStringStatus(fmi2Component c, const fmi2StatusKind s, fmi2String *value) {
-			fmi::Instance& inst = instances[c];
-			std::string status;
-			client->getStringStatus(status, inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s));
-			if (!status.empty()){
-				*value = status.c_str(); // WARNING char buffer won't live beyond this scope !!
-				return fmi2OK;
+			try {
+				fmi::Instance& inst = instances[c];
+				std::string status;
+				client->getStringStatus(status, inst, static_cast<org::raspinloop::fmi::StatusKind::type>(s));
+				if (!status.empty()){
+					*value = status.c_str(); // WARNING char buffer won't live beyond this scope !!
+					return fmi2OK;
+				}
+				return fmi2Discard;
 			}
-			return fmi2Discard;
+			catch (std::exception){
+				try { fmi_transport->close(); }
+				catch (std::exception){}
+				return fmi2Error;
+			}
 		}
 
