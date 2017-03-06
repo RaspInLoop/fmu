@@ -1,6 +1,8 @@
 version: 1.0.{build}
 image: Visual Studio 2013
-configuration: Release
+configuration: 
+ - Release
+ - Debug
 platform:
 - x86
 - x64
@@ -65,11 +67,30 @@ install:
 build:
   project: ril/Ril.sln
   verbosity: minimal
+artifacts:
+ - path: x64\Release\*
+   name: release_x64
+   type: zip
+   
+ - path: x64\debug\*
+   name: debug_x64
+   type: zip 
+   
+ - path: debug\*
+   name: debug_x86
+   type: zip
+   
+ - path: release\*
+   name: release_x64
+   type: zip 
+ 
 
 on_success:
   - ps: >-
       cd ril
 
+      If ($env:Configuration -Match "Release") {
+      
       If ($env:Platform -Match "x86") {
 
        mvn deploy "-Darch=winx86" "-Dgpg.skip=true" --settings mvnsettings.xml
@@ -79,4 +100,6 @@ on_success:
 
        mvn deploy "-Darch=winx64" "-Dgpg.skip=true" --settings mvnsettings.xml
 
+       }
+       
        }
