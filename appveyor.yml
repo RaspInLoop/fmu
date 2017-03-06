@@ -68,19 +68,19 @@ build:
   project: ril/Ril.sln
   verbosity: minimal
 artifacts:
- - path: x64\Release\*
+ - path: ril\x64\Release\*
    name: release_x64
    type: zip
    
- - path: x64\debug\*
+ - path: ril\x64\Debug\*
    name: debug_x64
    type: zip 
    
- - path: debug\*
+ - path: ril\Debug\*
    name: debug_x86
    type: zip
    
- - path: release\*
+ - path: ril\Release\*
    name: release_x64
    type: zip 
  
