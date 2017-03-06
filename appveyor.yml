@@ -70,20 +70,16 @@ build:
 artifacts:
  - path: ril\x64\Release\*
    name: release_x64
-   type: zip
    
  - path: ril\x64\Debug\*
    name: debug_x64
-   type: zip 
    
  - path: ril\Debug\*
    name: debug_x86
-   type: zip
    
  - path: ril\Release\*
    name: release_x64
-   type: zip 
- 
+
 
 on_success:
   - ps: >-
