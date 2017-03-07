@@ -374,9 +374,11 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 					fmi_transport->open();
 				client->freeInstance(it->second);
 				instances.erase(it);
+				fmi_transport->close();
+				
 			}
 			catch (std::exception ){	
-				try { fmi_transport->close(); }
+				try { if (fmi_transport->isOpen()) fmi_transport->close(); }
 				catch (std::exception){}
 			}
 		}
