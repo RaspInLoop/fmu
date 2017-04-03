@@ -24,8 +24,7 @@ before_install:
 before_script:
 - ls -R $HOME/thrift
 - "$HOME/thrift/bin/thrift -r  --gen cpp ril/ril.thrift"
-- ls -R gen-cpp
-- cat gen-cpp/ril_types.h
+- ls -R $HOME/thrift
 script:
 - cd ril && make THRIFT_DIR=$HOME/thrift
 
