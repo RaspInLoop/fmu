@@ -21,7 +21,7 @@ $(GENERATED_SOURCES): $(THRIFT_DEFINITION)
 	$(CC) $(CBITSFLAGS) $(CFLAGS) $(PIC) $< -o $@
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS)  $(CBITSFLAGS) $(OBJECTS) -fvisibility=hidden -Wl,-Bstatic -llibthrift -Wl,-Bdynamic  -shared -Wl,-soname,$@ -o $@
+	$(CC) $(LDFLAGS)  $(CBITSFLAGS) $(OBJECTS) -fvisibility=hidden -Wl,-Bstatic -lthrift -Wl,-Bdynamic  -shared -Wl,-soname,$@ -o $@
 
 clean:
 	rm -rf gen-cpp
