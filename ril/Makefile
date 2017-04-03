@@ -3,7 +3,7 @@ GENERATED_DIR=gen-cpp
 CC=g++
 CFLAGS= -std=c++0x -c -Wall -I$(GENERATED_DIR) -I$(SHARED_DIR) -I$(THRIFT_DIR)/include 
 PIC= -fPIC
-LDFLAGS= -L$(HOME)/thrift/lib/
+LDFLAGS= -L$(THRIFT_DIR)/lib/
 # CBITSFLAGS is set to -m32 to build linux32 fmus
 
 THRIFT_DEFINITION=ril.thrift
