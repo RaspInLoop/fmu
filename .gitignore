@@ -24,9 +24,19 @@
 *.lai
 *.la
 *.a
-*.lib
+
 
 # Executables
 *.exe
 *.out
 *.app
+
+Windows 
+*.suo
+*.sdf
+/ril/Win32
+/ril/x64
+/ril/gen-cpp
+/ril/ril_fmi
+/thrift-0.10.0
+/ril/target

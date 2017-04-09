@@ -1,0 +1,101 @@
+version: 1.0.{build}
+image: Visual Studio 2013
+configuration: 
+ - Release
+ - Debug
+platform:
+- x86
+- x64
+environment:
+  THRIFT_EXE_PATH: C:\projects\fmu\thrift-0.10.0.exe
+  THRIFT_DIR: C:\projects\fmu\thrift-0.10.0\lib\cpp
+  BOOST_ROOT: C:\Libraries\boost\
+  BOOST_LIB_32: C:\Libraries\boost\lib32-msvc-12.0
+  BOOST_LIB_64: C:\Libraries\boost\lib64-msvc-12.0
+
+  OSSRH_JIRA_USERNAME:
+    secure: WMhdJiW2wh9ftQPirukCVQY2Hp8RpbxSUVwRDp2v4wQ=
+  OSSRH_JIRA_PASSWORD:
+    secure: o33xELZotwMLyES5doLl/9L6+BEGRPDnoJxXs0HW6bk=
+  GPG_PASSPHRASE:
+    secure: +o/Jlls7dnR64lK9bToPZs4No2BZ97EsFkvZFE4W61g=
+
+cache:
+  - C:\maven\
+  - C:\Users\appveyor\.m2
+
+install:
+- ps: |
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      if (!(Test-Path -Path "C:\maven\apache-maven-3.2.5\" )) {
+        (new-object System.Net.WebClient).DownloadFile(
+          'http://www.us.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.zip',
+          'C:\maven-bin.zip'
+        )
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
+      }
+- cmd: SET PATH=C:\maven\apache-maven-3.2.5\bin;%JAVA_HOME%\bin;%PATH%
+- cmd: SET M2_HOME=C:\maven\apache-maven-3.2.5
+- cmd: dir %M2_HOME%
+- cmd: SET MAVEN_OPTS=-Xmx4g
+- cmd: SET JAVA_OPTS=-Xmx4g
+- ps: Start-FileDownload  http://archive.apache.org/dist/thrift/0.10.0/thrift-0.10.0.tar.gz
+- ps: Start-FileDownload  http://archive.apache.org/dist/thrift/0.10.0/thrift-0.10.0.exe
+- cmd: 7z x thrift-0.10.0.tar.gz -so | 7z x -si -ttar > nul
+- ps: (Get-Content thrift-0.10.0\lib\cpp\3rdparty.props) | ForEach-Object { $_ -replace "\`$\(THIRD_PARTY\)\\boost\\boost_1_47_0", "C:\Libraries\boost\" } | Set-Content thrift-0.10.0\lib\cpp\3rdparty.props
+- ps: (Get-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj) | select-string -pattern 'Include=.*TSSLSocket\.' -notmatch | Set-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
+- ps: >-
+   $xml = [xml](Get-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj)
+
+   $node = $xml.Project
+
+   $node.ToolsVersion= "12.0"
+
+   foreach($PropertyGroup in $xml.Project.PropertyGroup){
+      if ($PropertyGroup.Label  -eq 'Configuration'){
+         $newChild = $xml.CreateElement("PlatformToolset","http://schemas.microsoft.com/developer/msbuild/2003")
+
+         $newChild.set_InnerXML("v120")
+
+         $PropertyGroup.AppendChild($newChild)
+      }
+   }
+   $xml.OuterXml | Set-Content thrift-0.10.0\lib\cpp\libthrift.vcxproj
+
+- cmd: echo "install done"
+
+build:
+  project: ril/Ril.sln
+  verbosity: minimal
+artifacts:
+ - path: ril\x64\Release\*
+   name: release_x64
+   
+ - path: ril\x64\Debug\*
+   name: debug_x64
+   
+ - path: ril\Debug\*
+   name: debug_x86
+   
+ - path: ril\Release\*
+   name: release_x64
+
+
+on_success:
+  - ps: >-
+      cd ril
+
+      If ($env:Configuration -Match "Release") {
+      
+      If ($env:Platform -Match "x86") {
+
+       mvn deploy "-Darch=winx86" "-Dgpg.skip=true" --settings mvnsettings.xml
+
+       }
+       Else {
+
+       mvn deploy "-Darch=winx64" "-Dgpg.skip=true" --settings mvnsettings.xml
+
+       }
+       
+       }
