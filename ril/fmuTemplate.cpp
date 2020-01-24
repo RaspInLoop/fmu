@@ -27,7 +27,10 @@
 
 #include "fmuTemplate.h"
 #include <iostream>
+#include <string>
 #include <cstdarg>
+#include <cstdlib>
+
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/transport/TSocket.h>
 #include <thrift/transport/TTransportUtils.h>
@@ -61,19 +64,11 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			switch (ul_reason_for_call)
 			{
 			case DLL_PROCESS_ATTACH:
-			{
-				fmi_socket = boost::shared_ptr<TTransport>(new TSocket("localhost", 9090));
-				fmi_transport = boost::shared_ptr<TTransport>(new TBufferedTransport(fmi_socket));
-				fmi_protocol = boost::shared_ptr<TProtocol>(new TBinaryProtocol(fmi_transport));
-				client = boost::shared_ptr<fmi::CoSimulationClient>(new fmi::CoSimulationClient(fmi_protocol));
-				
+			{								
 				break;			
 			}
 			case DLL_PROCESS_DETACH:
-			{
-				if (fmi_transport->isOpen())
-					fmi_transport->close();
-				instances.clear();				
+			{	
 				break;
 			}
 
@@ -92,11 +87,7 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 	 *  * initializer of the lib.
 	 *   */
 	static void Initializer(int argc, char** argv, char** envp)
-	{
-	     fmi_socket = boost::shared_ptr<TTransport>(new TSocket("localhost", 9090));
-             fmi_transport = boost::shared_ptr<TTransport>(new TBufferedTransport(fmi_socket));
-             fmi_protocol = boost::shared_ptr<TProtocol>(new TBinaryProtocol(fmi_transport));
-             client = boost::shared_ptr<fmi::CoSimulationClient>(new fmi::CoSimulationClient(fmi_protocol));
+	{	     
 	}
 
 	__attribute__((destructor))
@@ -106,9 +97,7 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 	 *    */
 	static void Finalizer()
 	{
-	     if (fmi_transport->isOpen())
-                  fmi_transport->close();
-             instances.clear();
+
 	}
 #endif 
 
@@ -184,6 +173,27 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			fmi2String fmuResourceLocation, const fmi2CallbackFunctions *functions,
 			fmi2Boolean visible, fmi2Boolean loggingOn) {
 			// ignoring arguments: fmuResourceLocation, visible
+
+			const char * host =  std::getenv(std::string(instanceName)+"_HOST");
+			if (host == NULL)
+			{
+				functions->logger(functions->componentEnvironment, instanceName, fmi2Error, "error",
+					"missing ENV Variable:"+ std::string(instanceName)+"_HOST" );
+				return NULL;
+			}
+			const char* portStr = std::getenv(std::string(instanceName)+"_PORT");
+			if (portStr == NULL)
+			{
+				functions->logger(functions->componentEnvironment, instanceName, fmi2Error, "error",
+					"missing ENV Variable:"+ std::string(instanceName)+"_PORT" );
+				return NULL;
+			}
+			int port = std::stoi(portStr);
+			
+			fmi_socket = boost::shared_ptr<TTransport>(new TSocket(std::string(host), port));
+            fmi_transport = boost::shared_ptr<TTransport>(new TBufferedTransport(fmi_socket));
+            fmi_protocol = boost::shared_ptr<TProtocol>(new TBinaryProtocol(fmi_transport));
+            client = boost::shared_ptr<fmi::CoSimulationClient>(new fmi::CoSimulationClient(fmi_protocol));
 			
 			if (!functions->logger) {
 				return NULL;
