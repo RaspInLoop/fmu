@@ -21,7 +21,6 @@ before_script:
 - sudo apt-get update -qq
 - sudo apt-get install libboost-thread-dev libboost-system-dev libboost-test-dev
 - bash installthrift.sh
-before_script:
 - ls -R $HOME/thrift
 - "$HOME/thrift/bin/thrift -r  --gen cpp ril/ril.thrift"
 - ls -R $HOME/thrift
