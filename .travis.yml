@@ -5,8 +5,6 @@ cache:
   - "~/.m2/repository"
 addons:
   apt:
-    sources:
-    - boost-latest
     packages:
     - libboost1.55-all-dev
     - libevent-dev
@@ -20,6 +18,9 @@ addons:
     - libssl-dev
     - maven
 before_install:
+before_script:
+- sudo apt-get update -qq
+- sudo apt-get install libboost-thread-dev libboost-system-dev libboost-test-dev
 - bash installthrift.sh
 before_script:
 - ls -R $HOME/thrift
