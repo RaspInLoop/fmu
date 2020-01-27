@@ -6,7 +6,6 @@ cache:
 addons:
   apt:
     packages:
-    - libboost1.55-all-dev
     - libevent-dev
     - automake
     - autoconf
