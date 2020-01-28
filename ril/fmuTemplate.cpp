@@ -174,18 +174,18 @@ static fmi2String logCategoriesNames[] = { "logAll", "logError", "logFmiCall", "
 			fmi2Boolean visible, fmi2Boolean loggingOn) {
 			// ignoring arguments: fmuResourceLocation, visible
 
-			const char * host =  std::getenv(std::string(instanceName)+"_HOST");
+			const char * host =  std::getenv((std::string(instanceName)+"_HOST").c_str());
 			if (host == NULL)
 			{
 				functions->logger(functions->componentEnvironment, instanceName, fmi2Error, "error",
-					"missing ENV Variable:"+ std::string(instanceName)+"_HOST" );
+					("missing ENV Variable:"+ std::string(instanceName)+"_HOST").c_str() );
 				return NULL;
 			}
-			const char* portStr = std::getenv(std::string(instanceName)+"_PORT");
+			const char* portStr = std::getenv((std::string(instanceName)+"_PORT").c_str());
 			if (portStr == NULL)
 			{
 				functions->logger(functions->componentEnvironment, instanceName, fmi2Error, "error",
-					"missing ENV Variable:"+ std::string(instanceName)+"_PORT" );
+					("missing ENV Variable:"+ std::string(instanceName)+"_PORT").c_str() );
 				return NULL;
 			}
 			int port = std::stoi(portStr);
